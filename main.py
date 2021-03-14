@@ -27,7 +27,7 @@ def karyotype_segment(config_path, ckpt_path, img_path):
     print(result)
 
 
-def karyotype_classify(config_path, ckpt_path, img_path):
+def karyotype_detect(config_path, ckpt_path, img_path):
     detector = init_detector(config_path, ckpt_path)
     result = inference_detector(detector, img_path)
     print(result)
@@ -47,7 +47,9 @@ def main():
     if args.type == 'karyotype_segment':
         karyotype_segment(config_path, ckpt_path, img_path)
     if args.type == 'karyotype_classify':
-        karyotype_classify(config_path, ckpt_path, img_path)
+        karyotype_detect(config_path, ckpt_path, img_path)
+    if args.type == 'karyotype_count':
+        karyotype_detect(config_path, ckpt_path, img_path)
     if args.type == 'karyotype_polarity':
         karyotype_polarity(config_path, ckpt_path, img_path)
 
