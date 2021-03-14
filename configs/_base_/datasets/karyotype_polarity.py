@@ -27,16 +27,19 @@ data = dict(
         type=dataset_type,
         data_prefix='data/karyotype_polarity',
         ann_file='data/karyotype_polarity/train.txt',
-        pipeline=train_pipeline),
+        pipeline=train_pipeline,
+        classes=('up', 'down')),
     val=dict(
         type=dataset_type,
         data_prefix='data/karyotype_polarity',
         ann_file='data/karyotype_polarity/valid.txt',
-        pipeline=test_pipeline),
+        pipeline=test_pipeline,
+        classes=('up', 'down')),
     test=dict(
         # replace `data/val` with `data/test` for standard test
         type=dataset_type,
         data_prefix='data/karyotype_polarity',
         ann_file='data/karyotype_polarity/test.txt',
-        pipeline=test_pipeline))
+        pipeline=test_pipeline,
+        classes=('up', 'down')))
 evaluation = dict(interval=1, metric='accuracy')
