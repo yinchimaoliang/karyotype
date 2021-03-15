@@ -1,6 +1,6 @@
 import argparse
 
-from utils import karyotype_detect
+from utils import karyotype_detect, show_count_result
 
 
 def parse_args():
@@ -21,7 +21,8 @@ def main():
     img_path = args.img_path
     result_path = args.result_path  # noqa: F841
 
-    karyotype_detect(config_path, ckpt_path, img_path)
+    result = karyotype_detect(config_path, ckpt_path, img_path)
+    show_count_result(img_path, result, out_file=result_path)
 
 
 if __name__ == '__main__':
