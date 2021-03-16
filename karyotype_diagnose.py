@@ -4,7 +4,7 @@ import numpy as np
 import os
 from os import path as osp
 
-from utils import karyotype_detect, karyotype_segment
+from utils import karyotype_detect, karyotype_segment, rotate_img
 
 CLASS_NAMES = [
     '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14',
@@ -52,7 +52,8 @@ def segment_karyotype(segment_config, segment_ckpt_path, img_path):
         result = karyotype_segment(segment_config, segment_ckpt_path,
                                    osp.join(img_path, img_name))
         chromosome_masked = np.multiply(chromosome, result[0])
-        mmcv.imwrite(chromosome_masked, osp.join(img_path, img_name))
+        chromosome_rotated = rotate_img(chromosome_masked)
+        mmcv.imwrite(chromosome_rotated, osp.join(img_path, img_name))
 
 
 def main():
