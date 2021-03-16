@@ -1,8 +1,10 @@
 import argparse
 import mmcv
+import numpy as np
+import os
 from os import path as osp
 
-from utils import karyotype_detect
+from utils import karyotype_detect, karyotype_segment
 
 CLASS_NAMES = [
     '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14',
@@ -33,7 +35,6 @@ def detect_karyotype(detect_config, detect_ckpt_path, img_path, result_path):
     detect_results = karyotype_detect(detect_config, detect_ckpt_path,
                                       img_path)
     assert len(detect_results) == len(CLASS_NAMES)
-    mmcv.mkdir_or_exist(osp.join(result_path, 'detect_results'))
     for i, detect_result in enumerate(detect_results):
         for j in range(len(detect_result)):
             chromosome = img[int(detect_result[j][1]):int(detect_result[j][3]),
@@ -42,6 +43,16 @@ def detect_karyotype(detect_config, detect_ckpt_path, img_path, result_path):
                 chromosome,
                 osp.join(result_path, 'detect_results',
                          f'{CLASS_NAMES[i]}_{j}.png'))
+
+
+def segment_karyotype(segment_config, segment_ckpt_path, img_path):
+    img_names = os.listdir(img_path)
+    for img_name in img_names:
+        chromosome = mmcv.imread(osp.join(img_path, img_name), 0)
+        result = karyotype_segment(segment_config, segment_ckpt_path,
+                                   osp.join(img_path, img_name))
+        chromosome_masked = np.multiply(chromosome, result[0])
+        mmcv.imwrite(chromosome_masked, osp.join(img_path, img_name))
 
 
 def main():
@@ -54,7 +65,11 @@ def main():
     polarity_ckpt_path = args.polarity_ckpt_path  # noqa: F841
     img_path = args.img_path
     result_path = args.result_path
+
+    mmcv.mkdir_or_exist(osp.join(result_path, 'detect_results'))
     detect_karyotype(detect_config, detect_ckpt_path, img_path, result_path)
+    segment_karyotype(segment_config, segment_ckpt_path,
+                      osp.join(result_path, 'detect_results'))
 
 
 if __name__ == '__main__':
