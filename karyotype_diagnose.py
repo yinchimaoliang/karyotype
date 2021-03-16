@@ -4,7 +4,8 @@ import numpy as np
 import os
 from os import path as osp
 
-from utils import karyotype_detect, karyotype_segment, rotate_img
+from utils import (karyotype_classify, karyotype_detect, karyotype_segment,
+                   rotate_img, show_diagnose_result)
 
 CLASS_NAMES = [
     '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14',
@@ -16,13 +17,13 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Karyotype diagnose')
     parser.add_argument('--detect-config', help='detect config file path')
     parser.add_argument('--segment-config', help='segment config file path')
-    parser.add_argument('--polarity-config', help='polarity config file path')
+    parser.add_argument('--classify-config', help='classify config file path')
     parser.add_argument(
         '--detect-ckpt-path', help='detect checkpoint file path')
     parser.add_argument(
         '--segment-ckpt-path', help='segment checkpoint file path')
     parser.add_argument(
-        '--polarity-ckpt-path', help='polarity checkpoint file path')
+        '--classify-ckpt-path', help='classify checkpoint file path')
     parser.add_argument('--img-path', help='image path')
     parser.add_argument('--result-path', help='path to save the result')
     args = parser.parse_args()
@@ -56,14 +57,25 @@ def segment_karyotype(segment_config, segment_ckpt_path, img_path):
         mmcv.imwrite(chromosome_rotated, osp.join(img_path, img_name))
 
 
+def classify_karyotype(classify_config, classify_ckpt_path, img_path):
+    img_names = os.listdir(img_path)
+    for img_name in img_names:
+        chromosome = mmcv.imread(osp.join(img_path, img_name), 0)
+        result = karyotype_classify(classify_config, classify_ckpt_path,
+                                    osp.join(img_path, img_name))
+        if result['pred_label'] == 1:
+            chromosome = mmcv.imrotate(chromosome, 180)
+        mmcv.imwrite(chromosome, osp.join(img_path, img_name))
+
+
 def main():
     args = parse_args()
     detect_config = args.detect_config
     segment_config = args.segment_config  # noqa: F841
-    polarity_config = args.polarity_config  # noqa: F841
+    classify_config = args.classify_config  # noqa: F841
     detect_ckpt_path = args.detect_ckpt_path
     segment_ckpt_path = args.segment_ckpt_path  # noqa: F841
-    polarity_ckpt_path = args.polarity_ckpt_path  # noqa: F841
+    classify_ckpt_path = args.classify_ckpt_path  # noqa: F841
     img_path = args.img_path
     result_path = args.result_path
 
@@ -71,6 +83,11 @@ def main():
     detect_karyotype(detect_config, detect_ckpt_path, img_path, result_path)
     segment_karyotype(segment_config, segment_ckpt_path,
                       osp.join(result_path, 'detect_results'))
+    classify_karyotype(classify_config, classify_ckpt_path,
+                       osp.join(result_path, 'detect_results'))
+    show_diagnose_result(
+        osp.join(result_path, 'detect_results'),
+        osp.join(result_path, 'karyotype_diagnose.png'), CLASS_NAMES)
 
 
 if __name__ == '__main__':

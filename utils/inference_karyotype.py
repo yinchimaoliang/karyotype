@@ -14,7 +14,7 @@ def karyotype_detect(config_path, ckpt_path, img_path):
     return result
 
 
-def karyotype_polarity(config_path, ckpt_path, img_path):
+def karyotype_classify(config_path, ckpt_path, img_path):
     classifier = init_classifier(config_path, ckpt_path)
     result = inference_classifer(classifier, img_path)
     return result

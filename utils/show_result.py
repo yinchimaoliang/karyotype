@@ -1,8 +1,10 @@
 import cv2
 import mmcv
 import numpy as np
+import os
 from mmcv.image import imread, imwrite
 from mmcv.visualization import color_val
+from os import path as osp
 
 
 def imshow_count_bboxes(img,
@@ -77,3 +79,31 @@ def show_count_result(img,
         bbox_color=bbox_color,
         thickness=thickness,
         out_file=out_file)
+
+
+def show_diagnose_result(img_path, result_path, class_names):
+    img_names = os.listdir(img_path)
+    names_dict = dict()
+    for i, class_name in enumerate(class_names):
+        names_dict[class_name] = i
+
+    imgs = [[] for _ in range(len(class_names))]
+    max_height = 0
+    max_width = 0
+    for img_name in img_names:
+        img = mmcv.imread(osp.join(img_path, img_name), 0)
+        max_height = max(max_height, img.shape[0])
+        max_width = max(max_width, img.shape[1])
+        imgs[names_dict[img_name.split('_')[0]]].append(img)
+
+    canvas = np.zeros([(max_height + 20) * 4 + 20, (max_width + 20) * 12 + 20])
+    for i, img in enumerate(imgs):
+        width = sum([i.shape[1] for i in img]) + 20 * (len(img))
+        y_start = int((2 * (i % 6) + 1) * (max_width + 20) - width / 2)
+        x_end = ((i // 6) + 1) * (max_height + 20)
+        for j in range(len(img)):
+            canvas[x_end - img[j].shape[0]:x_end,
+                   y_start:y_start + img[j].shape[1]] = img[j]
+            y_start += img[j].shape[1] + 20
+
+    mmcv.imwrite(canvas, result_path)
