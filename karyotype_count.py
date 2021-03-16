@@ -4,7 +4,7 @@ from utils import karyotype_detect, show_count_result
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Train a model')
+    parser = argparse.ArgumentParser(description='Karyotype count')
     parser.add_argument('config', help='train config file path')
     parser.add_argument('--ckpt-path', help='checkpoint file path')
     parser.add_argument('--img-path', help='image path')
