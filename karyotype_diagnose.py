@@ -31,7 +31,7 @@ def parse_args():
     return args
 
 
-def detect_karyotype(detect_config, detect_ckpt_path, img_path, result_path):
+def detect(detect_config, detect_ckpt_path, img_path, result_path):
     img = mmcv.imread(img_path, 0)
     detect_results = karyotype_detect(detect_config, detect_ckpt_path,
                                       img_path)
@@ -46,7 +46,7 @@ def detect_karyotype(detect_config, detect_ckpt_path, img_path, result_path):
                          f'{CLASS_NAMES[i]}_{j}.png'))
 
 
-def segment_karyotype(segment_config, segment_ckpt_path, img_path):
+def segment(segment_config, segment_ckpt_path, img_path):
     img_names = os.listdir(img_path)
     for img_name in img_names:
         chromosome = mmcv.imread(osp.join(img_path, img_name), 0)
@@ -57,7 +57,7 @@ def segment_karyotype(segment_config, segment_ckpt_path, img_path):
         mmcv.imwrite(chromosome_rotated, osp.join(img_path, img_name))
 
 
-def classify_karyotype(classify_config, classify_ckpt_path, img_path):
+def classify(classify_config, classify_ckpt_path, img_path):
     img_names = os.listdir(img_path)
     for img_name in img_names:
         chromosome = mmcv.imread(osp.join(img_path, img_name), 0)
@@ -71,20 +71,20 @@ def classify_karyotype(classify_config, classify_ckpt_path, img_path):
 def main():
     args = parse_args()
     detect_config = args.detect_config
-    segment_config = args.segment_config  # noqa: F841
-    classify_config = args.classify_config  # noqa: F841
+    segment_config = args.segment_config
+    classify_config = args.classify_config
     detect_ckpt_path = args.detect_ckpt_path
-    segment_ckpt_path = args.segment_ckpt_path  # noqa: F841
-    classify_ckpt_path = args.classify_ckpt_path  # noqa: F841
+    segment_ckpt_path = args.segment_ckpt_path
+    classify_ckpt_path = args.classify_ckpt_path
     img_path = args.img_path
     result_path = args.result_path
 
     mmcv.mkdir_or_exist(osp.join(result_path, 'detect_results'))
-    detect_karyotype(detect_config, detect_ckpt_path, img_path, result_path)
-    segment_karyotype(segment_config, segment_ckpt_path,
-                      osp.join(result_path, 'detect_results'))
-    classify_karyotype(classify_config, classify_ckpt_path,
-                       osp.join(result_path, 'detect_results'))
+    detect(detect_config, detect_ckpt_path, img_path, result_path)
+    segment(segment_config, segment_ckpt_path,
+            osp.join(result_path, 'detect_results'))
+    classify(classify_config, classify_ckpt_path,
+             osp.join(result_path, 'detect_results'))
     show_diagnose_result(
         osp.join(result_path, 'detect_results'),
         osp.join(result_path, 'karyotype_diagnose.png'), CLASS_NAMES)

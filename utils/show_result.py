@@ -19,16 +19,9 @@ def imshow_count_bboxes(img,
         img (str or ndarray): The image to be displayed.
         bboxes (ndarray): Bounding boxes (with scores), shaped (n, 4) or
             (n, 5).
-        labels (ndarray): Labels of bboxes.
-        class_names (list[str]): Names of each classes.
         score_thr (float): Minimum score of bboxes to be shown.
         bbox_color (str or tuple or :obj:`Color`): Color of bbox lines.
-        text_color (str or tuple or :obj:`Color`): Color of texts.
         thickness (int): Thickness of lines.
-        font_scale (float): Font scales of texts.
-        show (bool): Whether to show the image.
-        win_name (str): The window name.
-        wait_time (int): Value of waitKey param.
         out_file (str or None): The filename to write the image.
 
     Returns:
@@ -106,4 +99,5 @@ def show_diagnose_result(img_path, result_path, class_names):
                    y_start:y_start + img[j].shape[1]] = img[j]
             y_start += img[j].shape[1] + 20
 
+    canvas = 255 - canvas
     mmcv.imwrite(canvas, result_path)
